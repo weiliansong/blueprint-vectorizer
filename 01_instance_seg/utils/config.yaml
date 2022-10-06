@@ -1,0 +1,53 @@
+# Hyper parameters
+lr: 0.0003 # 0.001 # 0.0003
+batch_size: 16 #16 #32
+max_epoch_num: 400 # 60
+lr_step: 1 # 4
+lr_gamma: 0.96 # 0.92 # 0.96 # 0.98 # 0.5
+
+# model
+channel: 3
+num_class: 7
+embedding_dim: 8  # 64
+
+# data loader
+input_size: 256 #32 # 256
+final_size: 256
+h: 256
+w: 256
+method: 'random' # 'full' vs 'random' cropping as an input
+margin_size: 32
+pad_size: 224 # 16 # 64
+num_crop: 600 #400 # 1200 #400 # 100
+non_overlap: 32 # 16 # 128 # 16
+
+num_workers: 4
+val_interval: 1
+visualize_iter: 5
+use_cuda: True
+decay_rate: 0
+seed: 12138
+resume: True
+augmentation:
+
+base_dir:
+model_path:
+exp_base_dir:
+visualize_dir:
+
+output: ./final_output
+split_dir: preprocess/splits
+image_dir: preprocess/fp_img
+extra_dir: preprocess/fp_img
+mask_instance_dir: preprocess/instance
+mask_semantic_dir: preprocess/semantic
+semantic_pred_dir: preprocess/semantic
+
+# Loss parameters
+dv: 0
+dd: 2.5
+gamma: 0.005
+
+# Mean shift parameters
+bandwidth: 2.0 #0.5
+

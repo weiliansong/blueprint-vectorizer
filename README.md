@@ -1,1 +1,3 @@
-# blueprint-vectorizer
+# Blueprint Vectorizer
+
+Details coming soon!
