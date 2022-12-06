@@ -27,3 +27,6 @@ _Simon Fraser University_
     pages     = {1044-1059}
 }
 ```
+
+## Acknowledgment
+The research is supported by NSERC Discovery Grants, NSERC Discovery Grants Accelerator Supplements, and DND/NSERC Discovery Grants. We also thank GA Technologies for providing us with the building blue-print images.
