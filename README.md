@@ -16,6 +16,9 @@ _Simon Fraser University_
 
 [Code](https://github.com/weiliansong/blueprint-vectorizer)
 
+## Contact
+Weilian Song, weilians@sfu.ca
+
 ## Bibtex
 ```
 @InProceedings{Song_2022_ACCV,
