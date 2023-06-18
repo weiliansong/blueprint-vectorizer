@@ -1,0 +1,38 @@
+experiment_name: 2021-07-26_topo_net_xval_00
+test_id: 0
+
+n_cpu: 6
+
+n_classes: 8
+
+# data loading hyperparameters
+augmentation: true
+skip_uncommon: false
+uncommon_threshold: 20
+
+# high-level model hyperparameters
+model_choice: Transformer
+
+# CNN encoder hyperparameters
+encoder_side_len: 224
+encoder_pretrained: false  # NOTE unused
+
+# Transformer hyperparameters
+tf_ninp: 64
+tf_nhead: 8
+tf_nhid: 256
+tf_nlayers: 4
+tf_dropout: 0.1
+tf_norm: true
+tf_pass_gt: true
+
+# Optimizer
+lr_backbone: 0.001
+lr_transformer: 0.001
+weight_decay: 0.0001
+lr_drop: 20
+clip_norm: 0.1
+
+# Training hyperparameters
+n_epochs: 200
+b_size: 32

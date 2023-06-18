@@ -27,16 +27,16 @@ visualize_iter: 5
 use_cuda: True
 decay_rate: 0
 seed: 12138
-resume: True
+resume: False
 augmentation:
 
-base_dir:
+base_dir: ../data
 model_path:
-exp_base_dir:
+exp_base_dir: ../ckpts/01_instance_seg
 visualize_dir:
 
 output: ./final_output
-split_dir: preprocess/splits
+split_dir: splits
 image_dir: preprocess/fp_img
 extra_dir: preprocess/fp_img
 mask_instance_dir: preprocess/instance

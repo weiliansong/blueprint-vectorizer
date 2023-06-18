@@ -1,0 +1,50 @@
+experiment_name: 2021-07-26_gan_xval_00
+
+# which cross-validation split to use for testing
+test_id: 0
+
+# dataloader settings
+sliding_bboxes: false
+sliding_window: 128
+sliding_stride: 128
+
+object_bboxes: true
+
+use_gt: true
+use_pred: false
+
+# Adam optimizer settings
+g_lr: 0.0001
+d_lr: 0.0001
+b1: 0.5
+b2: 0.9
+
+# What kind of image as input, floorplan or boundary image
+image: fp
+topo_input: false
+ind_input: true
+
+shortcut_16: false
+shortcut_32: false
+shortcut_64: false
+
+# option for turning off GAN loss, if desired
+gan_loss: true
+
+# regularization loss after G, along with weighting
+aux_loss: MSE
+lambda_aux: 1000
+neg_weight: 5
+ignore_gray: true
+
+# gradient penalty term
+lambda_gp: 10
+
+latent_dim: 128
+
+lambda_bits: 0
+
+# training and loader settings
+n_cpu: 5
+b_size: 64
+n_epochs: 200

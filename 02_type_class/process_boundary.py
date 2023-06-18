@@ -8,7 +8,7 @@ import paths
 
 def load_and_segment(fp_id, threshold1=0.95, threshold2=10):
     # probabilities boundaries
-    final_index = np.load(paths.PRED_BOUNDARY_ROOT + 'final_index%s.npy' % fp_id)
+    final_index = np.load(paths.PRED_BOUNDARY_ROOT + "%s.npy" % fp_id)
 
     image = np.copy(final_index)
     h, w = image.shape
@@ -51,20 +51,19 @@ def post_process_bg_black(seg):
     unique.extend(list(np.asarray(np.unique(seg[:, 0:4]))))
     unique = list(np.asarray(unique))
 
-
     for i in unique:
         seg[seg == i] = 0
 
     return seg
 
 
-def process(seg, i = 0):
+def process(seg, i=0):
     """
     Assign different colors to different segments (which is not connected)
     """
     seg_new = np.zeros_like(seg)
 
-    for i in range(0, np.amax(seg)+1):
+    for i in range(0, np.amax(seg) + 1):
         mask_seg = np.ma.masked_where(seg == i, seg).mask
 
         if mask_seg.ndim < 2:
@@ -85,13 +84,12 @@ def seq_name_seg(seg):
     num_seg = np.asarray(num_seg)
 
     for i in range(num_seg.shape[0]):
-        seg[seg==num_seg[i]] = i
-
+        seg[seg == num_seg[i]] = i
 
     return seg
 
 
-def remove_small_seg(seg, threshold = 10):
+def remove_small_seg(seg, threshold=10):
 
     seg = process(seg)
     # merge small segmens with the majority of surrounding segments
@@ -102,7 +100,7 @@ def remove_small_seg(seg, threshold = 10):
     unique_dic = dict(zip(unique, counts))
 
     # pad for solving boundary issue
-    seg_pad = np.pad(seg, [(1, 1), (1, 1)], mode='constant', constant_values=-1)
+    seg_pad = np.pad(seg, [(1, 1), (1, 1)], mode="constant", constant_values=-1)
 
     # s = sum(counts)
     # threshold  = ((h*w)/20000) # 100
@@ -120,7 +118,7 @@ def remove_small_seg(seg, threshold = 10):
             y = list(result[1])
 
             for i in range(len(x)):
-                neighbor = seg_pad[x[i]-1:x[i]+2, y[i]-1:y[i]+2]
+                neighbor = seg_pad[x[i] - 1 : x[i] + 2, y[i] - 1 : y[i] + 2]
                 neighbor = neighbor.flatten()
                 neighbor2 = neighbor
                 neighbor = list(neighbor)
@@ -129,7 +127,7 @@ def remove_small_seg(seg, threshold = 10):
                 neighbor_unique = list(neighbor_unique)
 
                 if key in neighbor:
-                     neighbor = list(filter(lambda a: a != key, neighbor))
+                    neighbor = list(filter(lambda a: a != key, neighbor))
 
                 # if -1 in neighbor:
                 #     neighbor = list(filter(lambda a: a != -1, neighbor))
@@ -143,10 +141,10 @@ def remove_small_seg(seg, threshold = 10):
 
             if len(neighbors):
                 # get most frequent element
-                freq = max(set(neighbors), key = neighbors.count)
+                freq = max(set(neighbors), key=neighbors.count)
 
                 num = neighbors_unique.count(freq)
-                ratio = num/value_boundary
+                ratio = num / value_boundary
 
                 # if value < 99 or ratio > 0.9 or len(list(set(neighbors))) == 2: # 0.9
                 #     # change segment "key" to "freq"
@@ -161,7 +159,7 @@ def remove_small_seg(seg, threshold = 10):
 def remove_boundaries(seg):
 
     # change all 0 pixels (boundaries) to the most repetetive neighbor color
-    seg_pad = np.pad(seg, [(1, 1), (1, 1)], mode='constant', constant_values=1)
+    seg_pad = np.pad(seg, [(1, 1), (1, 1)], mode="constant", constant_values=1)
 
     boundaries = np.where(seg_pad == 0)
     x = list(boundaries[0])
@@ -169,10 +167,10 @@ def remove_boundaries(seg):
 
     patience = 0
 
-    while(len(x) > 0):
+    while len(x) > 0:
         for i in range(len(x)):
 
-            neighbor = seg_pad[x[i]-1:x[i]+2, y[i]-1:y[i]+2]
+            neighbor = seg_pad[x[i] - 1 : x[i] + 2, y[i] - 1 : y[i] + 2]
             neighbor = neighbor.flatten()
             neighbor = np.delete(neighbor, 4)
 
@@ -210,7 +208,6 @@ def remove_boundaries(seg):
 
         if len(x) == len_x_past:
             patience = 1
-
 
     seg = seg_pad[1:-1, 1:-1]
 

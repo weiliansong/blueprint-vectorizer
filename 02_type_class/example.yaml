@@ -1,0 +1,26 @@
+experiment_name: 2021-07-25_semantic_class_xval_00
+test_id: 1
+
+# data
+input_size: 64
+crop_view: full
+crop_margin: 32
+min_side_len: 128
+damage_margin: 4
+damage_side_len: 16
+
+# model
+
+# loss
+
+# training
+batch_size: 64
+num_epochs: 10
+num_workers: 6
+
+lr: 0.001
+gamma: 0.5
+step_size: 1
+patience: 100
+
+# eval

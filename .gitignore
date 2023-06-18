@@ -1,0 +1,6 @@
+data/
+ckpts/
+*.zip
+*.pyc
+*.sh
+.vscode/
