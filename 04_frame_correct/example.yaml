@@ -1,7 +1,7 @@
-experiment_name: 2021-07-26_gan_xval_00
+experiment_name: 2021-07-26_gan_xval_01
 
 # which cross-validation split to use for testing
-test_id: 0
+test_id: 1
 
 # dataloader settings
 sliding_bboxes: false

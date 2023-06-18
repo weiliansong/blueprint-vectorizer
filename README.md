@@ -79,8 +79,8 @@ This stage outputs the instance segmentation of each floorplan.
 
 ```
 cd 01_instance_seg/
-python train.py --test_fold_id 0     # train
-python predict_new.py --test_fold 0  # predict
+python train.py --test_fold_id 1     # train
+python predict_new.py --test_fold 1  # predict
 ```
 
 ### Semantic classification
@@ -110,8 +110,8 @@ It also outputs the fixed segmentation masks, using the previously trained topol
 cd 04_frame_correct/
 python train_cnn.py --hparam_f example.yaml
 
-GAN_YAML = "../ckpts/04_frame_correct/2021-07-26_gan_xval_00/hparams.yaml"
-TOPO_YAML = "../ckpts/03_frame_detect/2021-07-26_topo_net_xval_00/hparams.yaml"
+GAN_YAML = "../ckpts/04_frame_correct/2021-07-26_gan_xval_01/hparams.yaml"
+TOPO_YAML = "../ckpts/03_frame_detect/2021-07-26_topo_net_xval_01/hparams.yaml"
 python refinery.py --gan_f $GAN_YAML --topo_f $TOPO_YAML
 ```
 
