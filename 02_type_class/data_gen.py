@@ -1,17 +1,16 @@
-import os
 import glob
+import os
 import shutil
-import numpy as np
+from multiprocessing import Pool
+from os.path import join as pj
+
 import matplotlib
 import matplotlib.pyplot as plt
-
-from PIL import Image
-from multiprocessing import Pool
-
-import utils
+import numpy as np
 import paths
 import process_boundary
-
+import utils
+from PIL import Image
 
 args = utils.parse_arguments()
 
@@ -23,13 +22,13 @@ def job(fp_id):
     print(fp_id)
 
     # save predicted instance
-    instance_gt = np.load(paths.GT_INSTANCE_ROOT + "%s.npy" % fp_id)
     instance_pred = process_boundary.load_and_segment(fp_id)
-
-    assert instance_gt.shape == instance_pred.shape
     np.save(
         paths.PRED_INSTANCE_ROOT + "%s.npy" % fp_id, instance_pred, allow_pickle=False
     )
+
+    if not os.path.exists(paths.GT_SEMANTIC_ROOT):
+        return
 
     # vote on semantics of predicted instance
     semantic_gt = np.load(paths.GT_SEMANTIC_ROOT + "%s.npy" % fp_id)
@@ -117,8 +116,13 @@ if __name__ == "__main__":
     os.makedirs(paths.VOTE_SEMANTIC_ROOT, exist_ok=True)
     os.makedirs(paths.GA_ROOT + "preprocess/visualize_vote/", exist_ok=True)
 
-    semantic_files = glob.glob(paths.GT_SEMANTIC_ROOT + "*.npy")
-    fp_ids = [x.split("/")[-1].split(".")[0] for x in semantic_files]
+    if args.test_folder:
+        print('User-specified test folder')
+        img_files = glob.glob(pj(args.test_folder, "*"))
+        fp_ids = [x.split("/")[-1].split(".")[0] for x in img_files]
+    else:
+        semantic_files = glob.glob(pj(paths.IMG_ROOT, "*"))
+        fp_ids = [x.split("/")[-1].split(".")[0] for x in semantic_files]
 
     with Pool(5) as p:
         p.map(job, fp_ids)

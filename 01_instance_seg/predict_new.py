@@ -1,23 +1,24 @@
+import glob
 import os
+import random
+from os.path import join as pj
+
+import metric_loss
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
-from torch.utils.data import DataLoader
-from torch.optim.lr_scheduler import StepLR
-from imageio import imsave, imread
-from sklearn.decomposition import PCA
-import random
-
-from vis_cat import *
-from models.unet import UNet
-from models.github_model import *
-import metric_loss
 from data_loader_test import FloorplanDatasetTest
+from imageio import imread, imsave
+from models.github_model import *
+from models.unet import UNet
 from models.unet.unet_model import UNet
-from utils.misc import save_checkpoint, count_parameters, transfer_optimizer_to_gpu
-from utils.config import Struct, load_config, compose_config_str
-
+from sklearn.decomposition import PCA
+from torch.autograd import Variable
+from torch.optim.lr_scheduler import StepLR
+from torch.utils.data import DataLoader
+from utils.config import Struct, compose_config_str, load_config
+from utils.misc import count_parameters, save_checkpoint, transfer_optimizer_to_gpu
+from vis_cat import *
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -53,9 +54,17 @@ if model_path:
 model.to(device)
 model.eval()
 
+# retrieve all the test images
+# TODO implement
+if args.test_folder:
+    test_fs = glob.glob(pj(args.test_folder, "*"))
 
-test_dataset = FloorplanDatasetTest("test", args.test_fold_id, configs=configs)  # extra
-test_loader = DataLoader(test_dataset, batch_size=1, num_workers=1, shuffle=False)
+test_dataset = FloorplanDatasetTest(
+    "test",
+    test_fs=test_fs,
+    configs=configs,
+)
+test_loader = DataLoader(test_dataset, batch_size=1, num_workers=0, shuffle=False)
 
 flag_reset = True  # True
 n = configs.non_overlap
@@ -76,13 +85,8 @@ if flag_reset:
                 os.makedirs(os.path.dirname(check_path), exist_ok=True)
 
             images = batch_data["image"].to(device)
-            labels = batch_data["label"]
-            pad = batch_data["pad"]
-
             image_full = batch_data["image_full"]
-            label_full = batch_data["label_full"]
-            semantic_pred_full = batch_data["semantic_pred_full"]
-            semantic_full = batch_data["semantic_full"]
+            pad = batch_data["pad"]
 
             f_ids.append(f_id)
 
@@ -101,7 +105,6 @@ if flag_reset:
             # print(check_path)
             # if not os.path.exists(check_path): # idx == 8:
             if True:  # idx == 8:
-
                 for h_i in range(h_num):
                     for w_i in range(w_num):
                         py = h_i * n
@@ -118,10 +121,7 @@ if flag_reset:
                         ]
 
                         image = images[h_i, w_i, :, :, :]
-                        label = labels[h_i, w_i, :, :]
-
                         image = torch.unsqueeze(image, 0)
-                        label = torch.unsqueeze(label, 0)
 
                         pred = model(image)
                         image = image.cpu()
@@ -144,12 +144,6 @@ if flag_reset:
                             mode="constant",
                             constant_values=0,
                         )
-                        label = np.pad(
-                            label,
-                            [(0, 0), (0, 1), (0, 1)],
-                            mode="constant",
-                            constant_values=0,
-                        )
                         pred = np.pad(
                             pred,
                             [(0, 0), (0, 1), (0, 1)],
@@ -163,11 +157,6 @@ if flag_reset:
                             pad_new[0] : -pad_new[1] - 1,
                             pad_new[2] : -pad_new[3] - 1,
                         ]
-                        label = label[
-                            :,
-                            pad_new[0] : -pad_new[1] - 1,
-                            pad_new[2] : -pad_new[3] - 1,
-                        ]
                         pred = pred[
                             :,
                             pad_new[0] : -pad_new[1] - 1,
@@ -175,10 +164,9 @@ if flag_reset:
                         ]
 
                         image = torch.from_numpy(image)
-                        label = torch.from_numpy(label)
                         pred = torch.from_numpy(pred)
 
-                        pred_seg = segment(image, label, pred, "new", idx)
+                        pred_seg = segment(image, pred, "new", idx)
                         pred_seg = np.pad(
                             pred_seg,
                             [(pad_new[0], pad_new[1]), (pad_new[2], pad_new[3])],
@@ -196,32 +184,13 @@ if flag_reset:
 
                 # remove padding
                 image_full = image_full[:, pad[0] : -pad[1], pad[2] : -pad[3]]
-                label_full = label_full[pad[0] : -pad[1], pad[2] : -pad[3]]
-                semantic_pred_full = semantic_pred_full[
-                    pad[0] : -pad[1], pad[2] : -pad[3]
-                ]
-                semantic_full = semantic_full[pad[0] : -pad[1], pad[2] : -pad[3]]
 
-                # merging: method 1
-                # pred_full, pred_full1 = merge_tiles(pred_segs, idx, pad)
-
-                # merging: method 2
                 images = images.cpu()
-                # save_data(pred_segs, pred_segs1, images, labels, image_full, label_full, semantic_full, semantic_pred_full, pad, f_id)
-                # pred_full, pred_full1 = merge_tiles_2(pred_segs, idx, pad)
-
-                # visualization
-                # visualize(image_full, label_full, pred_full, pred_full1, semantic_full, semantic_pred_full, 'new', idx)
-
-                # check every tiles
-                # check_tiles(images, labels, pred_segs1, f_id)
-
                 _, h, w = image_full.shape
 
                 boundary = final_seg_merge(pred_segs1, f_id, pad, h, w, n, configs)
 
                 print("=======================================")
-                # print(STOP)
 
 
 print("Data saved!")

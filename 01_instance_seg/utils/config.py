@@ -2,22 +2,27 @@ import argparse
 from pdb import set_trace as st
 
 from ruamel.yaml import YAML
-yaml = YAML(typ='safe')
+
+yaml = YAML(typ="safe")
 
 
 def parse_arguments():
-  parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser()
 
-  parser.add_argument('--test_fold_id', dest='test_fold_id',
-                      action='store', type=int, required=True)
+    parser.add_argument(
+        "--test_fold_id", dest="test_fold_id", action="store", type=int, required=True
+    )
+    parser.add_argument(
+        "--test_folder", dest="test_folder", action="store", type=str, default=""
+    )
 
-  args = parser.parse_args()
+    args = parser.parse_args()
 
-  return args
+    return args
 
 
 def load_config(file_path):
-    with open(file_path, 'r') as f:
+    with open(file_path, "r") as f:
         config_dict = yaml.load(f)
     return config_dict
 
@@ -62,15 +67,15 @@ def compose_config_str(configs, keywords, extra=None):
     str_list = list()
     for keyword in keywords:
         if hasattr(configs, keyword):
-            str_list.append(keyword + '_' + str(getattr(configs, keyword)))
-    configs_str = '_'.join(str_list)
+            str_list.append(keyword + "_" + str(getattr(configs, keyword)))
+    configs_str = "_".join(str_list)
     if extra is not None:
-        configs_str += '_' + extra
+        configs_str += "_" + extra
     return configs_str
 
 
-if __name__ == '__main__':
-    config_dic = load_config('config.yaml')
+if __name__ == "__main__":
+    config_dic = load_config("config.yaml")
     configs = Struct(**config_dic)
     print(config_dic)
     print(configs.lr)

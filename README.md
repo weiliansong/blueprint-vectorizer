@@ -72,7 +72,9 @@ Please download them from [here](https://drive.google.com/file/d/1LXHspV6-73tox3
 Our system consists of a number of pipelines. Each one is trained separately and the intermediate outputs are chained together to obtain the final results.
 In each section, we describe how to start the training and obtain the intermediate outputs for the next stage.
 
-Unfortunately even if you just want to run the pretrained models, you still need to prepare the GT segmentation labels. Or you can modify the dataloaders so they do not try to load them.
+~~Unfortunately even if you just want to run the pretrained models, you still need to prepare the GT segmentation labels. Or you can modify the dataloaders so they do not try to load them.~~
+
+Currently removing GT label dependencies, at least the first two stages are now dependency-free. Please still place your test images in `data/preprocess/fp_img` and specify the flags below.
 
 ### Instance segmentation
 This stage outputs the instance segmentation of each floorplan.
@@ -81,6 +83,9 @@ This stage outputs the instance segmentation of each floorplan.
 cd 01_instance_seg/
 python train.py --test_fold_id 1     # train
 python predict_new.py --test_fold 1  # predict
+
+# if you are just evaluating without GT labels
+python predict_new.py --test_folder ../data/preprocess/fp_img
 ```
 
 ### Semantic classification
@@ -91,6 +96,10 @@ cd 02_type_class/
 python data_gen.py                             # data preprocessing
 python train.py --config_path example.yaml     # train
 python evaluate.py --config_path example.yaml  # predict
+
+# if you are just evaluating without GT labels
+python data_gen.py --test_folder ../data/preprocess/fp_img
+python evaluate.py --config_path example.yaml  --test_folder ../data/preprocess/fp_img
 ```
 
 ### Frame detection

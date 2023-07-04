@@ -1,28 +1,26 @@
-import os
-import time
-import json
-import shutil
 import argparse
+import glob
+import json
+import os
+import shutil
+import time
+from os.path import join as pj
 
-import torch
-import torchvision
-import torch.nn as nn
-import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-
-from PIL import Image, ImageDraw, ImageFont
-from tqdm import tqdm
-from torch.utils.data import DataLoader
-from matplotlib.colors import ListedColormap
-
-from skimage import measure
-from skimage.transform import resize
-from skimage.morphology import dilation, erosion, square
-
-import utils
+import numpy as np
 import paths
-
+import torch
+import torch.nn as nn
+import torchvision
+import utils
+from matplotlib.colors import ListedColormap
+from PIL import Image, ImageDraw, ImageFont
+from skimage import measure
+from skimage.morphology import dilation, erosion, square
+from skimage.transform import resize
+from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 random_cmap = matplotlib.colors.ListedColormap(np.random.rand(256, 3))
 
@@ -68,21 +66,21 @@ model = model.eval()
 
 
 """ Stuff happens here :D """
-split_json = paths.SPLITS_ROOT + "ids_%d.json" % config["test_id"]
-with open(split_json, "r") as f:
-    fp_ids = json.load(f)
+if args.test_folder:
+    print("User-specified test folder")
+    img_files = glob.glob(pj(args.test_folder, "*"))
+    fp_ids = [x.split("/")[-1].split(".")[0] for x in img_files]
+else:
+    split_json = paths.SPLITS_ROOT + "ids_%d.json" % config["test_id"]
+    with open(split_json, "r") as f:
+        fp_ids = json.load(f)
 
 for fp_id in tqdm(fp_ids):
     image = Image.open(paths.IMG_ROOT + "%s.jpg" % fp_id)
     image = np.array(image, dtype=np.float32) / 255.0
 
-    semantic_gt = np.load(paths.GT_SEMANTIC_ROOT + "%s.npy" % fp_id)
-    instance_gt = np.load(paths.GT_INSTANCE_ROOT + "%s.npy" % fp_id)
-    semantic_vote = np.load(paths.VOTE_SEMANTIC_ROOT + "%s.npy" % fp_id)
     instance_pred = np.load(paths.PRED_INSTANCE_ROOT + "%s.npy" % fp_id)
-    semantic_pred = np.zeros_like(semantic_vote)
-
-    assert image.shape == semantic_gt.shape == semantic_vote.shape
+    semantic_pred = np.zeros_like(instance_pred)
 
     for instance_id in np.unique(instance_pred):
         instance_mask = instance_pred == instance_id
@@ -139,12 +137,8 @@ for fp_id in tqdm(fp_ids):
     # save full visualizations
     instance_img = random_cmap(instance_pred) * 255.0
     sem_pred_img = my_cmap(semantic_pred / 7.0) * 255.0
-    sem_vote_img = my_cmap(semantic_vote / 7.0) * 255.0
-    sem_gt_img = my_cmap(semantic_gt / 7.0) * 255.0
 
-    full_vis = np.concatenate(
-        [instance_img, sem_vote_img, sem_pred_img, sem_gt_img], axis=1
-    )
+    full_vis = np.concatenate([instance_img, sem_pred_img], axis=1)
     full_vis = Image.fromarray(full_vis.astype("uint8"))
 
     # write some captions on it

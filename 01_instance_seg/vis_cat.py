@@ -51,7 +51,7 @@ global segmented_index
 segmented_index = np.zeros((h, w))
 
 
-def segment(input, label, features, name, id):
+def segment(input, features, name, id):
     """
     This function performs postprocessing (dimensionality reduction and clustering) for a given network
     output. it also visualizes the resulted segmentation along with the original image and the ground truth
@@ -95,8 +95,6 @@ def segment(input, label, features, name, id):
 
     # visualization and evaluation
     image = tensor_to_image(input.cpu()[0])  # input: image
-    label = label.cpu().numpy()[0]
-    label = np.int64(label)
 
     pred_seg = cv2.resize(
         np.stack(
@@ -111,13 +109,6 @@ def segment(input, label, features, name, id):
     )
 
     save_pred_seg = predict_segmentation.astype(np.uint8)
-
-    label = cv2.resize(
-        np.stack(
-            [colors_256[label, 0], colors_256[label, 1], colors_256[label, 2]], axis=2
-        ),
-        (w, h),
-    )
 
     return save_pred_seg
 
@@ -189,7 +180,6 @@ colors = np.array(
 
 
 def merge_tiles(segs, id, pad):
-
     segs = segs.astype("uint32")
 
     os.makedirs("visualizations/segmentations_merge/", exist_ok=True)
@@ -284,7 +274,6 @@ def merge_neighbor_row(tile1, tile2):
     final_pair = []
 
     for i in range(non_zero.shape[1]):
-
         count = bar_pair_idx[non_zero[0, i], non_zero[1, i]]
         if count > thresh:
             final_pair.append([non_zero[0, i], non_zero[1, i] + np.amax(tile1)])
@@ -300,7 +289,6 @@ def merge_neighbor_row(tile1, tile2):
 
 
 def merge_col(tile1, tile2):
-
     w = tile1.shape[0]
     h = tile1.shape[1]
 
@@ -512,7 +500,6 @@ def color_image(image):
 
 
 def post_process(seg):
-
     # merge small segmens with the majority of surrounding segments
 
     # num_seg = np.unique(seg)
@@ -562,7 +549,6 @@ def post_process(seg):
                 neighbors_unique.extend(neighbor_unique)
 
         if len(neighbors):
-
             # get most frequent element
             freq = max(set(neighbors), key=neighbors.count)
 
@@ -620,7 +606,6 @@ def remove_float_seg(seg):
             neighbors_unique.extend(neighbor_unique)
 
         if len(neighbors):
-
             if set(neighbors) == set([0]):
                 # change segment "key" to background
                 seg[seg == key] = 0
@@ -629,7 +614,6 @@ def remove_float_seg(seg):
 
 
 def post_process_boundary(seg):
-
     # to reserve 0 for background
     seg = seg + 1
 
@@ -695,7 +679,6 @@ def remove_gap(seg):
 
     for i in range(1, seg.shape[0] - 1):
         for j in range(1, seg.shape[1] - 1):
-
             # 1 pixel gap
             if len(list(set([seg[i - 1, j], seg[i, j], seg[i + 1, j]]))) == 3:
                 if seg[i, j - 1] == seg[i, j] and seg[i, j + 1] == seg[i, j]:
@@ -737,7 +720,6 @@ def check_tiles(images, labels, segs, id):
     label_all = np.empty((0, 0))
 
     for h_i in range(h_num):
-
         # to assign first elements
         w_i = 0
         tile = segs[h_i, w_i, :, :]
@@ -852,7 +834,6 @@ def add_text2(image2):
 
 
 def merge_semantic_instance(semantic, semantic_pred, instance_pred):
-
     r = 3
     weights = {0: 0, 1: 1, 2: r, 3: r, 4: r, 5: r, 6: r, 7: 1}
 
@@ -980,7 +961,6 @@ def merge_tiles_2(segs, id, pad, h, w):
     for h_i in range(h_num):
         print("*", h_i)
         for w_i in range(w_num):
-
             seg = segs[h_i, w_i, :, :]
             seg = seq_name_seg(seg)
             seg_pad = np.pad(seg, [(1, 1), (1, 1)], mode="constant", constant_values=-1)
@@ -1204,7 +1184,6 @@ def final_seg_merge(segs, idx, pad, h, w, n, configs):
     for h_i in range(h_num):
         print("*", h_i)
         for w_i in range(w_num):
-
             seg = segs[h_i, w_i, :, :]
             seg = seq_name_seg(seg)
             seg_pad = np.pad(seg, [(1, 1), (1, 1)], mode="constant", constant_values=-1)
@@ -1325,7 +1304,6 @@ def add_text10(image):
 
 
 def post_process_boundary_black(seg):
-
     # to reserve 0 for background
     seg = seg + 1
 
