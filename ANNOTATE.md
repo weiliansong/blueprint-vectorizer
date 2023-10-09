@@ -8,14 +8,14 @@ Add the floorplan images into the annotator by clicking `Project -> Add local fi
 
 Add two region attributes "label" and "attribute" by typing in the attribute name and clicking "+".
 
-![add_attribute]('resources/add_attribute.png')
+![add_attribute](resources/add_attribute.png)
 
 Now you're ready to perform the actual annotation.
 
 In essense: use the region shape tools at the top left to draw the desired polygons, and then update the region attribute table by pressing `spacebar`.
 Please see the below gif for an example of a wall instance.
 
-![annotate]('resources/annotate.gif')
+![annotate](resources/annotate.gif)
 
 For "label", it can be one of the following classes: `outer,inner,window,door,portal,room,frame`.
 
