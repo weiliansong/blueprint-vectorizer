@@ -20,6 +20,8 @@ pip install ruamel.yaml tqdm opencv_python
 
 ### Data
 
+__NEW!__ See [here](ANNOTATE.md) for details on annotating and preprocessing your own data.
+
 Unfortunately we are not allowed to share the blueprint images or their labels.
 Here we will explain the format and file structure for the input data, so you can prepare yours the same way.
 
